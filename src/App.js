@@ -4,6 +4,7 @@ import  { DragDropContext, Droppable} from 'react-beautiful-dnd'
 import TaskDetails from './components/task-details'
 import ContextMenu from './components/context-menu'
 import { toast, ToastContainer, Slide } from 'react-toastify';
+import {Dropdown} from 'react-bootstrap';
 import 'react-toastify/dist/ReactToastify.css';
 
 class App extends React.Component {
@@ -19,6 +20,9 @@ class App extends React.Component {
     this.displayContext = this.displayContext.bind(this)
     this.moveTasksColumn = this.moveTasksColumn.bind(this);
     this.changeColumnTitle=this.changeColumnTitle.bind(this);
+    this.saveStateToStorage=this.saveStateToStorage.bind(this);
+    this.loadStorage=this.loadStorage.bind(this);
+    this.clearStorage=this.clearStorage.bind(this);
     this.state={
       taskSerial: 10,
       tasks:{
@@ -91,12 +95,6 @@ class App extends React.Component {
   }
 
 
-  componentDidUpdate(prevState){
-    if(this.state !== prevState){
-      const appState = JSON.stringify(this.state)
-      localStorage.savedState= appState
-    }
-  }
 
   displayTaskDetails(bool, taskId){
     const newTaskDetails = {
@@ -130,8 +128,17 @@ class App extends React.Component {
   }
 
   componentDidMount(){
+    this.loadStorage();
+  }
+
+  saveStateToStorage() {
+    const appState = JSON.stringify(this.state);
+    localStorage.savedState = appState;
+  }
+
+  loadStorage(){
     let savedState = localStorage.savedState
-    if(!savedState){
+    if (!savedState) {
       const state = JSON.stringify(this.state)
       localStorage.savedState = state
       return
@@ -143,7 +150,7 @@ class App extends React.Component {
         columnSerial: savedState.columnSerial,
         columns: savedState.columns,
         columnOrder: savedState.columnOrder,
-        taskDetails: {display: false, taskId: null},
+        taskDetails: { display: false, taskId: null },
         displayContext: {
           display: false,
           contextId: null,
@@ -151,6 +158,10 @@ class App extends React.Component {
         }
       })
     }
+  }
+
+  clearStorage(){
+    localStorage.clear();
   }
 
   onDragEnd = result => {
@@ -325,11 +336,21 @@ class App extends React.Component {
             `}
             id="navbar"
             >
-              <h2 className="text-white navbar-brand" onClick={this.switchView}>Simple Kanban</h2>
-              <div>
+              <h2 className="text-white navbar-brand">Simple Kanban</h2>
+              <div className="row">
+              <Dropdown>
+                <Dropdown.Toggle variant="success" id="dropdown-basic">
+                  Menu
+                </Dropdown.Toggle>
 
+                <Dropdown.Menu>
+                  <Dropdown.Item onClick={this.saveStateToStorage}>Save</Dropdown.Item>
+                  <Dropdown.Item onClick={this.loadStorage}>Load</Dropdown.Item>
+                  <Dropdown.Item onClick={this.clearStorage}>Clear</Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
                 <button
-                  className="btn btn-primary"
+                  className="btn btn-primary ml-2"
                   onClick={this.addColumn}
               >Add New Column <i className="fa fa-plus" aria-hidden="true"></i>
                 </button>
