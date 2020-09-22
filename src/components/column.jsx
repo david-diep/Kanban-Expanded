@@ -44,7 +44,6 @@ class Column extends React.Component {
   }
 
 
-
   render() {
     return (
       <Draggable draggableId={this.props.column.id} index={this.props.index}>

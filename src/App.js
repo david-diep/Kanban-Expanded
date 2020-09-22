@@ -19,9 +19,7 @@ class App extends React.Component {
     this.displayContext = this.displayContext.bind(this)
     this.moveTasksColumn = this.moveTasksColumn.bind(this);
     this.changeColumnTitle=this.changeColumnTitle.bind(this);
-    this.switchView=this.switchView.bind(this)
     this.state={
-      view:"home",
       taskSerial: 10,
       tasks:{
         'task-1': { id: 'task-1', title:"Take out the garbage.", content:"Empty Trash Can"},
@@ -68,7 +66,7 @@ class App extends React.Component {
 
 
   changeTaskData(id, title, content){
-    const newTasks = JSON.parse(JSON.stringify(this.state.tasks))
+    const newTasks = {...this.state.tasks}
     const newTask = { id: id, title: title, content: content}
     newTasks[id]=newTask;
     this.setState({ tasks: newTasks }, () => toast.success("Task Updated!"))
@@ -109,9 +107,9 @@ class App extends React.Component {
   }
 
   deleteTask(id){
-    const newTasks = JSON.parse(JSON.stringify(this.state.tasks))
+    const newTasks = {...this.state.tasks}
     delete newTasks[id];
-    const newColumns = JSON.parse(JSON.stringify(this.state.columns))
+    const newColumns = {...this.state.columns}
     for(let column in newColumns){
       const deleteIndex = newColumns[column].taskIds.findIndex((taskId)=>taskId===id)
       if(deleteIndex>=0){
@@ -123,7 +121,7 @@ class App extends React.Component {
   }
 
   moveTasksColumn(originId, targetId) {
-    const newColumns = JSON.parse(JSON.stringify(this.state.columns))
+    const newColumns = {...this.state.columns}
     const ToMoveTasks = newColumns[originId].taskIds
     newColumns[originId].taskIds = [];
     const targetTasks = newColumns[targetId].taskIds.concat(ToMoveTasks)
@@ -225,13 +223,13 @@ class App extends React.Component {
   addCard(column){
     let taskSerial = this.state.taskSerial
     const newTaskSerial = taskSerial + 1
-    const newTasks = JSON.parse(JSON.stringify(this.state.tasks))
+    const newTasks = {...this.state.tasks}
     newTasks.[`task-${taskSerial}`] = {
       id: `task-${taskSerial}`,
       title: `Click to edit New Card`,
       content: ""
     }
-    const newColumns = JSON.parse(JSON.stringify(this.state.columns))
+    const newColumns = {...this.state.columns}
     newColumns[column].taskIds.unshift(`task-${taskSerial}`)
     this.setState({
       taskSerial: newTaskSerial,
@@ -264,8 +262,8 @@ class App extends React.Component {
   }
 
   deleteColumn(id){
-    const newColumns = JSON.parse(JSON.stringify(this.state.columns))
-    const newTasks = JSON.parse(JSON.stringify(this.state.tasks))
+    const newColumns = {...this.state.columns}
+    const newTasks = {...this.state.tasks}
     const newColumnOrder=[...this.state.columnOrder]
     const deleteOrderIndex= newColumnOrder.findIndex((col)=>col===id)
     newColumnOrder.splice(deleteOrderIndex,1)
@@ -285,7 +283,7 @@ class App extends React.Component {
   addColumn(){
     const columnSerial = this.state.columnSerial
     const newColumnSerial = columnSerial + 1
-    const newColumns = JSON.parse(JSON.stringify(this.state.columns))
+    const newColumns = {...this.state.columns}
     const newColumnOrder = this.state.columnOrder.splice(0)
     newColumns[`column-${columnSerial}`] = {
       id: `column-${columnSerial}`,
@@ -300,78 +298,8 @@ class App extends React.Component {
     }, () => toast.info("New Column Added!"))
   }
 
-  switchView(){
-    if(this.state.view==="home"){
-      this.setState({view:"app"})
-    }else{
-      this.setState({view:"home"})
-    }
-  }
-
   render(){
 
-    if(this.state.view==="home"){
-      return(<>
-      <header>
-        <nav className="navbar bg-dark row justify-content-between">
-            <h2 className="text-white navbar-brand px-3">Simple Kanban</h2>
-            <button className="btn btn-info mx-3" onClick={this.switchView}>Go To Kanban</button>
-        </nav>
-      </header>
-      <div className='container'>
-        <div className='d-flex flex-column bg-light'>
-          <div className="m-3 p-3 bg-secondary">
-            <h2>Stay Organized, Keep it Simple</h2>
-            <p>Don't make things more complicated than it has to be. That's why we have simple Kanban.</p>
-            <div className="row justify-content-center">
-              <iframe title="tutorial" width="600" height="350" src="https://www.youtube.com/embed/gPx23Ss8KR8" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-              </div>
-          </div>
-          <div className="m-2 p-3 bg-info">
-            <h2>About This Project</h2>
-              <p><a href="https://github.com/david-diep/kanban-hackathon" target="_blank" rel="noopener noreferrer" className="text-dark">
-                <u>Simple Kanban</u></a> was a 3-day Mintbean Hackathon Project for the
-                <a href="https://sites.google.com/mintbean.io/javascriptbootcampolympics/home" target="_blank" rel="noopener noreferrer" className="text-dark"> <u>JavaScript Bootcamp Olympics.</u></a></p>
-              <p>The goal of the hackathon was to create a kanban board: an agile project management tool designed to help visualize work, limit work-in-progress, and maximize efficiency.
-                Essentially, it is a giant virtual board with post-it notes.
-              </p>
-              <p>We feel like we've been successful and we're proud of what we've managed to accomplish in the time frame.</p>
-          </div>
-          <div className="m-2 p-3 bg-secondary">
-            <h2>The Team</h2>
-            <div className="row justify-content-around">
-                <div className="p-2 m-2 bg-light">
-                    <h4>David Diep</h4>
-                  <div className="w-100 p-1">
-                    <img src="https://i.imgur.com/7Dz1MT5.png" alt="David Diep" width="300">
-                    </img>
-                    <div className="row p-2 w-100">
-                    <a class="btn btn-outline-dark m-1" href="https://github.com/david-diep/" target="_blank" rel="noopener noreferrer" role="button">GitHub <img class="logo" src="https://i.imgur.com/syIhqol.png" alt="gitHub"></img></a>
-                    <a class="btn btn-outline-primary m-1" href="https://www.linkedin.com/in/david-diep-dev/" target="_blank" rel="noopener noreferrer" role="button"><span class="align-bottom">Linked</span> <img class="logo" alt="linkedIn" src="https://i.imgur.com/lYabiUU.png"></img></a>
-                  </div>
-                  </div>
-              </div>
-                <div className="p-2 m-2  bg-light">
-                  <h4>Kevin Lenell</h4>
-                  <div className="w-100 p-1">
-                    <img src="https://i.imgur.com/akIMMka.png" alt="Kevin Lenell" width="300">
-                    </img>
-                    <div className="row p-2 w-100">
-                      <a class="btn btn-outline-dark m-1" href="https://github.com/krlenell" target="_blank" rel="noopener noreferrer" role="button">GitHub <img class="logo" src="https://i.imgur.com/syIhqol.png" alt="gitHub"></img></a>
-                      <a class="btn btn-outline-primary m-1" href="https://www.linkedin.com/in/kevin-lenell/" target="_blank" rel="noopener noreferrer" role="button"><span class="align-bottom">Linked</span> <img class="logo" alt="linkedIn" src="https://i.imgur.com/lYabiUU.png"></img></a>
-                    </div>
-                  </div>
-                </div>
-            </div>
-          </div>
-          <div>
-
-          </div>
-        </div>
-      </div>
-    </>  )
-    }
-    else{
     return (<>
         <div className="app overflow-x" onClick={this.handleClick}>
           {this.state.displayContext.display ?
@@ -405,7 +333,6 @@ class App extends React.Component {
                   onClick={this.addColumn}
               >Add New Column <i className="fa fa-plus" aria-hidden="true"></i>
                 </button>
-                <button className="btn btn-info ml-2" onClick={this.switchView}>Info</button>
               </div>
             </nav>
             <div className="navbar-space"></div>
@@ -454,10 +381,10 @@ class App extends React.Component {
           </DragDropContext>
           </div>
         </div>
-      <ToastContainer autoClose={1500} position="bottom-right" hideProgressBar={true} transition={Slide}/>
+      <ToastContainer autoClose={1500} position="bottom-right" hideProgressBar={true} transition={Slide} limit={3}/>
 </>
 
-    );}
+    );
 }}
 
 export default App;
